@@ -6,7 +6,7 @@
  *    -- performs CRUD operations for quizzes in the application
  */
 
-app.service('QuizService', function ($http) {
+app.service('QuizService', function ($http, $q) {
     var parent = this;
 
     /* Quiz object contructor */
@@ -35,12 +35,18 @@ app.service('QuizService', function ($http) {
 
     /* get quiz names for the left panel */
     this.getList = function () {
-        return $http.get("php/quiz-names.php");
+        return $http.get("php/quiz-names.php")
+            .then(function (response) {
+                return response.data;
+            });
     };
 
     /* load quiz from database using quiz id */
     this.getQuiz = function (id) {
-        return $http.get("php/quiz-load.php?id=" + id);
+        return $http.get("php/quiz-load.php?id=" + id)
+            .then(function (response) {
+                return response.data;
+            });
     };
 
     /* create a new blank quiz */

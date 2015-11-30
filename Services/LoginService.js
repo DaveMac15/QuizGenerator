@@ -14,5 +14,13 @@ app.service('LoginService', function ($http) {
         return $http.post("php/signup.php", { username: name, password: password });
     };
 
+    this.getSessionVariables = function () {
+        return $http.get('php/session.php');
+    };
+
+    this.logout = function () {
+        return $http.get('php/logout.php');
+    };
+
 
 });

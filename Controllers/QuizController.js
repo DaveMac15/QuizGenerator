@@ -5,16 +5,22 @@
  * AngularJS controller to control the behaviour of Quiz application
  */
 
-app.controller('QuizController', function ($scope, $location, $window, QuizService, LoginService) {
-    
+app.controller('QuizController', function ($scope, $location, $window, Session, QuizService, LoginService) {
+   
+
     /* the currently loaded quiz */
     $scope.quiz = {};
 
     /* the user currently logged in */
-    $scope.user = { username: "", password: "" };
     $scope.loginform = { username: "", password: "" };
     $scope.loggedIn = false;
-
+    $scope.username = "";
+    
+    LoginService.getSessionVariables().success(function (response) {
+        $scope.username = response.username;
+        $scope.loggedIn = response.loggedIn;
+    });
+    
     /* variables for the sign up form */
     $scope.signup = { username:"", password:"", repeatPassword:"", submitted:false, alreadyExistsError:false };
 
@@ -38,6 +44,8 @@ app.controller('QuizController', function ($scope, $location, $window, QuizServi
 
     $scope.score = 0;
 
+
+
     /* call the following functions on load / page refresh: */
     $scope.onLoad = function () {
         var path = $location.path().replace("/", "");
@@ -52,32 +60,35 @@ app.controller('QuizController', function ($scope, $location, $window, QuizServi
     };
     
 
-    QuizService.getList().then(
-        success = function (response) { $scope.quizList = response.data; },
-        fail = function (response) { alert("Failure loading database."); }
-    );
+    QuizService.getList().then(success = function (response) { $scope.quizList = response; });
 
     /* when user submits log in credentials */
     $scope.onClickLogin = function () {
+
         LoginService.login($scope.loginform.username, $scope.loginform.password).success(function (response) {
             if (response == "success") {
                 $scope.loggedIn = true;
-                $scope.user.username = $scope.loginform.username;
+                $scope.username = $scope.loginform.username;
                 $scope.loginform.username = "";
                 $scope.loginform.password = "";
 
+                
             } else {
                 alert(response);
             }
         });
     };
+
     $scope.onClickLogout = function () {
-        $scope.loggedIn = false;
-        $scope.user.username = "";
-        $scope.user.password = "";
+        
+        LoginService.logout().success(function () {
+            $scope.loggedIn = false;
+            $scope.username = "";
+        });
     };
 
     $scope.onClickSignUp = function (valid) {
+        
         $scope.signup.submitted = true;
         if (valid && $scope.signup.password == $scope.signup.repeatPassword) {
 
@@ -89,9 +100,11 @@ app.controller('QuizController', function ($scope, $location, $window, QuizServi
                 else if (response == 1) {
                     // success
                     $scope.signup.alreadyExistsError = false;
-                    $scope.user.username = $scope.signup.username;
-                    $scope.user.password = $scope.signup.password;
-                    $scope.loggedIn = true;
+                    
+                    
+                    $scope.loginform.username = $scope.signup.username;
+                    $scope.loginform.password = $scope.signup.password;
+                    $scope.onClickLogin();
                     $location.path('/home');
                 }
                 else {
@@ -112,16 +125,17 @@ app.controller('QuizController', function ($scope, $location, $window, QuizServi
         $scope.quizIndex = index;
 		$scope.highScores = [];
 		
-        $scope.quiz = QuizService.getQuiz(id).success(function (response) {
-            $scope.quiz = new QuizService.Quiz(id, name, response);
+		$scope.quiz = QuizService.getQuiz(id)
+            .then(function (response) {
+                $scope.quiz = new QuizService.Quiz(id, name, response);
 
-            // load the questions into Question objects
-            for (var i = 0; i < $scope.quiz.length; i++) {
-                var q = $scope.quiz.questions[i];
-                q = new QuizService.Question(q.text, q.options, q.correctIndex);
-            }
-            $location.path('quiz');
-        });
+                // load the questions into Question objects
+                for (var i = 0; i < $scope.quiz.length; i++) {
+                    var q = $scope.quiz.questions[i];
+                    q = new QuizService.Question(q.text, q.options, q.correctIndex);
+                }
+                $location.path('quiz');
+            });
     };
     
 
@@ -133,7 +147,7 @@ app.controller('QuizController', function ($scope, $location, $window, QuizServi
 
             $scope.score = $scope.calculateScore();
         
-            $scope.highScores = QuizService.getHighScores($scope.quiz.id, $scope.user.username, $scope.score)
+            $scope.highScores = QuizService.getHighScores($scope.quiz.id, $scope.username, $scope.score)
             .success(function (response) {              
                 $scope.highScores = response;   
             });
@@ -177,10 +191,10 @@ app.controller('QuizController', function ($scope, $location, $window, QuizServi
         $scope.submitted = true;       
         if (isValid) {            
             var id = $scope.quiz.id;
-            QuizService.saveQuiz($scope.quiz).success(function (response) {
+            QuizService.saveQuiz($scope.quiz).success(function (reponse) {
                 // if the quiz is newly created, add it to the left nav
                 if (id < 0) {
-                    id = response;                    
+                    id = response;
                     $scope.quizList.push({ name: $scope.quiz.name, id: id });
                     $scope.quizIndex = $scope.quizList.length - 1;
                 } else {
@@ -191,9 +205,6 @@ app.controller('QuizController', function ($scope, $location, $window, QuizServi
                 $scope.submitted = false;
                 $scope.message = "Quiz Saved";
                 $location.path('/message');
-                //$scope.onClickQuiz(id, $scope.quiz.name, $scope.quizIndex);
-            }).error(function(response) {
-                alert("Error saving quiz: " + response);
             });
         }
     };
