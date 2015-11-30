@@ -1,0 +1,116 @@
+﻿<div class="well">
+
+    <h1>{{pageTitle}}</h1>
+
+   
+    <form id="create_form" role="form" name="$root.createForm" novalidate>
+
+        <!-- Name of the quiz -->
+        <div class="form-group" ng-class="{ 'has-error' : createForm.quizName.$invalid && submitted }">
+            <h3>Name the Quiz:</h3>
+            <input type="text" ng-model="quiz.name" name="quizName" class="form-control input-lg" placeholder="Type quiz name here" required />
+            <p ng-show="createForm.quizName.$invalid && submitted" class="help-block">Required!</p>
+        </div>
+
+        <!-- Questions -->
+        <h3>Questions:</h3>
+        <div id="questions">
+            <div ng-repeat="question in quiz.questions">
+                <div ng-class="$odd ? 'row' : ''">
+                    <div class="col-md-6 col-sm-12 col-xs-12">
+                        <div class="well question-edit">
+                        <ng-form name="questionForm">
+                            <a ng-click="quiz.questions.length > 1 && quiz.questions.splice($index, 1)"
+                               
+                                class="pull-right"
+                                style="font-size:1.5em; position:relative; top:0; right:0; width:25px"
+                                data-toggle="tooltip"
+                                title="Remove this question">
+                                &#10005;
+                            </a>
+
+                            <!-- Question -->
+                            <div style="margin-right:25px">
+                                <div ng-class="{ 'has-error' : questionForm.questionText.$invalid && !questionForm.questionText.$pristine && submitted }">
+                                    <label>Question {{ $index + 1 }}:</label>
+                                    <input type="text" name="questionText" class="form-control" ng-model="question.text" placeholder="Type question here" required />
+                                    <div class="has-error" ng-show="questionForm.questionText.$invalid && submitted">
+                                        <span class="help-block">Required!</span>
+                                    </div>
+                                </div>
+
+                                <!-- Options -->
+                                <label>Choices:</label>
+                                <div ng-repeat="option in question.options">
+
+                                    <ng-form name="optionsForm">
+
+                                        <div ng-class="{ 'has-error' : optionsForm.op.$invalid && !optionsForm.op.$pristine && submitted }" style="position:relative">
+
+                                            <label style="position:absolute; left:0; margin-top:5px;">{{indexChar($index)}}. </label>
+                                            <a ng-click="question.options.length > 1 && question.options.splice($index, 1)"
+                                                class="option-remove"
+                                                data-toggle="tooltip" title="Remove option">
+                                                &times;
+                                            </a>
+                                            <div class="option-input-box">
+                                                <input type="text" name="op" ng-model="option.text" class="form-control input-sm" placeholder="Type option here" required />
+                                            </div>
+                                            <div class="has-error" ng-show="optionsForm.op.$invalid && submitted">
+                                                <span class="help-block">Required!</span>
+                                            </div>
+                                        </div>
+                                    </ng-form>
+
+                                </div>
+
+                                <div class="text-center">
+                                    <a ng-click="question.options.push({text:''})" class="center-block">
+                                        Add option
+                                    </a>
+                                </div>
+
+                                <!-- Correct answer -->
+                                <div class="form-inline">
+                                    <label style="margin-top:5px">Correct answer: </label>
+                                    <select ng-model="question.correctIndex">
+                                        <option ng-repeat="option in question.options"
+                                                value="{{$index}}"
+                                                ng-selected="{{$index == question.correctIndex}}">
+                                            {{indexChar($index)}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </ng-form>
+                    </div>
+                </div>
+               </div>
+            </div>
+        </div>
+
+        <div class="row text-center">   
+            <button class="btn btn-lg btn-primary" style="margin-top:20px" ng-click="quiz.addQuestion()">
+                Add Question
+            </button>
+        </div>
+        <div class="row text-center">
+            <div class="has-error" ng-show="submitted && createForm.$invalid"><p class="help-block">Please fill in all required fields.</p></div>
+        </div>
+        <div class="row text-center">
+            <div class="btn-group">
+                
+                <button class="btn btn-save" ng-disabled="!isEditMode"
+                        ng-click="onClickSave(createForm.$valid)">
+                    <span class="glyphicon glyphicon-floppy-disk"></span>  Save
+                </button>
+
+            </div>
+            
+        </div>
+    </form>
+</div>
+<div class="alert alert-success" ng-show="saved">
+    <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+    <p class="">Quiz saved.</p>
+</div>

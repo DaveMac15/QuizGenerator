@@ -1,0 +1,25 @@
+﻿<div class="well text-center">
+    
+    <h1>Welcome to Quiz Generator</h1>
+    <p style="font-size:1.5em">A place where you can create, edit, and enjoy online quizzes.</p>
+
+    <div class="jumbotron">        
+        <h1>Find a Quiz</h1>
+        <input type="text" class="form-control" ng-model="searchFilter" placeholder="Enter the keyword describing the quiz here" />
+        <div ng-show="searchFilter" class="list-group">
+            <div ng-repeat="quiz in quizList | filter:searchFilter" class="list-group-item">
+                <a ng-click="onClickQuiz(quiz.id, quiz.name, -1)">{{quiz.name}}</a>
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="jumbotron ">
+        <h1>Create your own Quiz</h1>
+        <button class="btn btn-save" ng-click="onClickCreate()">Launch Quiz Generator</button>
+    </div>
+
+    
+    
+    
+</div>

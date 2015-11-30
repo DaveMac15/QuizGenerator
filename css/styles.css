@@ -1,0 +1,14 @@
+﻿
+@keyframes fadeIn {
+    0% {opacity: 0;}
+    50% {opacity:0.5;}
+    100% {opacity:1;}
+}
+@keyframes fadeOut {
+    0% {opacity:1;}
+    50% {opacity:0.5;}
+    100% {opacity:0;}
+}
+
+.ng-enter   { animation: fadeIn 0.5s both ease-in; z-index: 8888; }
+.ng-leave   { animation: fadeOut 0.5 both ease-out; z-index: 9999; } 

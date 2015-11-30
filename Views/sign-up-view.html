@@ -1,0 +1,30 @@
+﻿<div class="well">
+    <h1>Sign up</h1>
+
+    <p>Use this fast and easy form to create an account.</p>
+    <form name="signupForm" novalidate>
+        <div class="form-group">
+            <label>User name: <input ng-model="signup.username" ng-minlength="4" type="text" name="username" class="form-control" required /></label>
+        </div>
+        <div class="form-group">
+            <label>Password: <input ng-model="signup.password" ng-minlength="4" type="password" name="password" class="form-control" required /></label>
+        </div>
+        <div class="form-group">
+            <label>Repeat password: <input ng-model="signup.repeatPassword" type="password" name="password" class="form-control" required /></label>       
+        </div>
+        <div class="has-error" ng-show="signup.alreadyExistsError || signup.submitted && signupForm.$invalid">
+            <p class="help-block" ng-show="signupForm.username.$error.minlength">Username must be at least 4 characters</p>
+            <p class="help-block" ng-show="signupForm.username.$error.required">Username required</p>
+            <p class="help-block" ng-show="signupForm.password.$error.minlength">Password must be at least 4 characters</p>
+            <p class="help-block" ng-show="signupForm.password.$error.required">Password required</p>
+            <p class="help-block" ng-show="signup.password && signup.repeatPassword && signup.password != signup.repeatPassword">Passwords do not match</p>
+            <p class="help-block" ng-show="signup.alreadyExistsError">Username already exists.</p>
+        </div>
+        <div class="form-group">
+            <input type="submit" ng-click="onClickSignUp(signupForm.$valid)" value="Submit" class="btn btn-primary btn-lg" />
+            
+        </div>
+    </form>
+
+
+</div>

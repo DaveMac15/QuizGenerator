@@ -1,0 +1,68 @@
+﻿
+
+<div class="list-group">
+
+    <h1 class="text-center list-group-item" style="margin-top:0px">{{ quiz.name }}</h1>
+    
+    <form name="playForm" novalidate>
+        
+        <div ng-repeat="q in quiz.questions" class="list-group-item">
+
+            <h3>{{$index + 1}}. {{ q.text }}</h3>
+            <div class="form-group" style="padding-left:20px">
+                <ng-form name="optionsPlayForm">
+                    <div ng-repeat="option in q.options" class="radio">
+                        <label><input type="radio" value="{{$index}}" ng-model="q.selectedAnswer" name="{{q}}" required />{{option.text}}</label>
+                    </div>
+                </ng-form>
+            </div>
+            <div ng-show="isCompleted">
+                <span ng-show="q.selectedAnswer == q.correctIndex" class="label label-success">
+                    Correct!
+                </span>
+                <span ng-hide="q.selectedAnswer == q.correctIndex" class="label label-danger">
+                    Incorrect!
+                </span>
+            </div>
+            <div class="has-error" ng-show="optionsPlayForm.$invalid && submitted">
+                <p class="help-block">Please select an answer</p>
+            </div>
+            
+        </div>
+
+        
+        <div class="has-error" ng-show="submitted && !isCompleted">
+            <p class="help-block">Please provide an answer for all questions.</p>
+        </div> 
+
+        <h1 class="jumbotron text-center" ng-show="submitted && isCompleted">Your score is: {{score}}%</h1>
+        <div class="list-group-item text-center" ng-hide="submitted && isCompleted">
+            <button ng-click="onClickSubmitQuiz(playForm.$valid)" type="button" class="btn btn-primary btn-lg">Submit</button>
+        </div>
+
+    </form>
+
+    
+</div>
+
+<div class="text-center" ng-show="submitted && isCompleted">
+    <h1 class="text-center list-group-item">High scores</h1>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th class="highscores-table-1"></th>
+                <th class="highscores-table-2">Name</th>
+                <th class="highscores-table-3">Score</th>
+            </tr>
+        </thead>
+		<tr ng-show="highScores.length == 0">
+			<td class="highscores-table-2" colspan="3">There are no highscores to display... yet.</td>
+		</tr>
+        <tr ng-repeat="highscore in highScores">
+            <td class="highscores-table-1">{{$index + 1}}.</td>
+            <td class="highscores-table-2">{{ highscore.name }}</td>
+            <td class="highScores-table-3">{{ highscore.score }}%</td>
+        </tr>
+    </table>
+</div>
+ 

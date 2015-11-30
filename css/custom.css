@@ -1,0 +1,162 @@
+﻿body {
+    background-color: #f5f5f5;
+    
+}
+
+main{
+    margin-top: 10px;
+    padding: 50px 0px 0px 0px;
+}
+
+footer{
+    z-index:-1;
+    color:#9d9d9d;
+}
+h1 {
+    color:#118C4E;
+}
+h3 {
+    color:#346f8e;
+}
+
+.well{
+    background-color:white;
+    background-image:none;
+    
+    margin-bottom:0px;
+    height:100% !important;
+}
+
+#questions .row {
+    margin-left:initial;
+    margin-right:initial;
+}
+#questions .well {
+    padding: 10px;
+    padding-left: 20px;
+    padding-right: 5px;
+}
+#questions .col-md-6, #questions .col-xs-12 {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+a:hover{
+    text-decoration:none;
+    cursor:pointer !important;
+}
+
+.option-input-box{
+    margin-left:20px; 
+    margin-right:20px;
+    margin-bottom:2px;
+}
+.option-remove{
+    position:absolute; 
+    right:0; 
+    top:0;
+    font-size: 1.5em;
+}
+#questions {
+    overflow:auto;
+}
+.question-edit{
+    min-height: 80px;
+}
+.question-edit {
+    background-color: #f5f5f5;
+    
+}
+.question-edit-2 {
+    background-color: black;
+    color:white;
+}
+
+footer li {
+    width: 100%;  
+}
+.dropdown button{
+    border:none !important;
+    height:100% !important;
+}
+.tools-menu {
+
+}
+
+.tools-menu a, .tools-menu button, .btn-save {
+    
+    background-image:linear-gradient(to bottom,#3c3c3c 0,#222 100%);
+    border-color:#101010;
+    color:#9d9d9d;
+    height:60px;
+    
+}
+.btn-save{
+     height:100px; 
+     border-radius:5px;
+     font-size:2em;
+     margin-top: 40px;
+     max-width:100% !important;
+     white-space:normal;
+}
+.btn-save:active {
+	background-image:linear-gradient(to bottom,#3c3c3c 0,#222 100%);
+	color:white;
+}
+.btn-save:focus {
+	color:#9d9d9d;
+}
+
+.tools-menu a:hover, .tools-menu button:hover, .btn-save:hover, .btn-addquestion:hover{
+    color:white;
+}
+.tools-menu a:visited, .tools-menu button:focus{
+    color:white;
+}
+button:disabled{
+    cursor:not-allowed;
+}
+.left-pane .well {
+    padding:0;
+    border:none;
+}
+
+
+
+.edit-toolbar{
+    position: fixed;
+    bottom: 0;
+    height: 80px;
+    z-index:1000;
+}
+
+.edit-toolbar-item{
+       
+}
+.edit-toolbar a{   
+    font-size:1.5em;
+}
+
+table {
+    font-size:1.5em;
+}
+.highscores-table-1 {
+    text-align:right;
+    width: 50px;
+}
+.highScores-table-2 {
+    
+}
+.highscores-table-3{
+    
+    width:50%;
+}
+.list-title {
+    background-color:#118C4E;
+    color:white;
+    font-weight:bold;
+    margin-top:0;
+}
+.jumbotron{
+    padding:20px;
+}

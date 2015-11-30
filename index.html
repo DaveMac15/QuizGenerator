@@ -1,0 +1,214 @@
+﻿<!DOCTYPE html>
+
+<html ng-app="app">
+<head>
+	<title>Quiz Website</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="css/bootstrap-3.3.5-dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/bootstrap-3.3.5-dist/css/bootstrap-theme.min.css" />
+    <link rel="stylesheet" href="css/custom.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body ng-controller="QuizController">
+    
+    <!-- top nav -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div id="top-menu" class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#/home" ng-click="isEditMode = false; isQuizOpen = false">Quiz Generator</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#/home" ng-click="isEditMode = false; isQuizOpen = false">Home</a></li>
+                    
+                    <!-- tools menu -->
+                    <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown">Tools <span class="caret"></span></a>
+                        <ul class="dropdown-menu list-group">
+                            <li>
+                                <button class="list-group-item" ng-click="onClickCreate()">Create</button>
+                            </li>
+                            <li>
+                                <button class="list-group-item" ng-disabled="isNewQuiz || !isQuizOpen" href="#/edit" ng-click="onClickEdit()">
+                                    <span class="glyphicon glyphicon-pencil"></span> Edit
+                                </button>
+                            </li>
+                            <li>
+                                <button class="list-group-item" ng-disabled="isNewQuiz || !isQuizOpen" href="#/message"
+                                        ng-click="onClickDelete()"
+                                        data-toggle="modal" data-target="#deleteModal">
+                                    <span class="glyphicon glyphicon-trash"></span> Delete
+                                </button>
+                            </li>
+                            <li>
+                                <button class="list-group-item" ng-disabled="!isEditMode"
+                                        ng-click="onClickSave($root.createForm.$valid)">
+                                    <span class="glyphicon glyphicon-floppy-disk"></span>  Save
+                                </button>
+                            </li>                          
+                        </ul>
+                    </li>
+                    <!-- top quizzes dropdown -->
+                    <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown">Top Quizzes <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                           <li>
+                                <a ng-repeat="quiz in quizList" href="#/quiz"
+                                   ng-click="onClickQuiz(quiz.id, quiz.name, $index)">
+                                    {{quiz.name}}
+                                </a>  
+                            </li>
+                        </ul>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+    </nav>
+	
+    <main>
+    
+    <div class="container">
+	    <div class="row">
+            <!-- left nav -->
+            <div class="col-md-2 col-sm-3 col-xs-12" >
+                <div class="container-fluid well" style="margin-bottom:10px;">
+                    <div ng-hide="loggedIn">
+                        <h2>Login</h2>
+                        <form name="loginForm" novalidate>
+                            <h4>Username:</h4>
+                            <input type='text' ng-model='loginform.username' name='name' class='form-control' required />
+                            <h4>Password:</h4>
+                            <input type='password' name='password' ng-model='loginform.password' class='form-control' required /><br />
+                            <input type='submit' ng-click="onClickLogin()" value='Login' class='btn btn-primary' />
+                        </form>
+                        <br />
+                        <p>Not a member? <a href='#/sign-up' onclick='hideLogin()'>Sign up</a></p>
+                    </div>
+                    <div ng-show="loggedIn">
+                        <h3>Welcome, {{user.username}}</h3>
+                        <a href="#/home" ng-click="onClickLogout()">Logout</a>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!-- this is where quiz is displayed -->            
+            <div class="col-md-8 col-sm-6 col-xs-12" style="margin-bottom:10px">
+                <div class="row">
+                    <div ng-view></div>
+                </div>
+                         
+            </div> 
+
+            <!-- right panel with list of quizzes -->
+            <div class="col-md-2 col-sm-3 col-xs-12 left-pane">
+                <div class="list-group well">
+                    
+                        <h4 class="list-group-item list-title">
+                            Quiz database:
+                        </h4>
+                        <a ng-repeat="quiz in quizList" class="list-group-item"
+                           ng-click="onClickQuiz(quiz.id, quiz.name, $index)">
+                            {{quiz.name}}
+                        </a>
+                    
+                </div>
+
+                <!-- tools menu for creating,editing,deleting quizzes -->
+                <div class="container-fluid">
+                    <nav class="tools-menu">
+                        <div class="list-group">     
+                        </div>
+                    </nav>
+                </div>
+            </div>                  
+        </div>        
+    </div>
+    </main>
+    <!-- footer -->
+	<footer class="text-center">  
+        <nav class="navbar navbar-inverse">
+            <div class="row">
+                <div class="col-md-4">
+                    <ul class="nav navbar-nav">
+                        <li><a href="#top">To the top <span class="glyphicon glyphicon-arrow-up"></span></a></li>               
+                        <li><a href="#/create" ng-click="onClickCreate()">Create a quiz</a></li>
+                        <li><a href="#/sign-up" ng-click="isEditMode = false; isQuizOpen = false">Create an account</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">© 2015 David MacCormick</div>
+            
+        </nav>
+
+    </footer>	
+
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3 class="modal-title">Delete</h3>
+                </div>
+                <div class="modal-body">
+                    <h5>Are you sure you want to delete the following quiz?</h5>
+                    <h3 class="text-center">{{quiz.name}}</h3>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" ng-click="onClickDelete()" class="btn btn-default" data-dismiss="modal">Confirm</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    
+     
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="css/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-route.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-animate.min.js"></script>
+    {{user.username}}
+    <script>
+    $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip({ 'placement': 'top' });
+        $('#login').popover({title: "<h1>Login:</h1>",
+            content: "<form name='loginForm' novalidate>Username: <input type='text' ng-model='user.username' name='name' class='form-control' required /><br />" +
+                     "Password: <input type='password' name='password' ng-model='user.password' class='form-control' required /><br />" +
+                     "<input type='submit' ng-click='onClickLogin()' value='Login' class='btn btn-primary' /></form><br /><br />" +
+                     "Not a member? <a href='#/sign-up' click='hideLogin()'>Sign up</a>",
+            html: true, placement: "auto bottom", container: 'body'
+        });
+
+    });
+
+    function hideLogin() {
+        $('#login').popover('hide');
+    }
+ 
+    $("a[href='#top']").click(function () { $("html, body").animate({ scrollTop: 0 }, "slow"); return false; });
+   
+</script>
+
+<!-- Latest compiled JavaScript -->
+<script src="app.js"></script>
+<script src="Services/QuizService.js"></script>
+<script src="Services/LoginService.js"></script>
+<script src="Controllers/QuizController.js"></script>
+
+</body>
+
+</html>
+
