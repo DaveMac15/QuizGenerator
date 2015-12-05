@@ -83,8 +83,11 @@
                             <input type='text' ng-model='loginform.username' name='name' class='form-control' required />
                             <h4>Password:</h4>
                             <input type='password' name='password' ng-model='loginform.password' class='form-control' required /><br />
-                            
+
                             <input type='submit' ng-click="onClickLogin()" value='Login' class='btn btn-primary' />
+                            <div class="has-error" ng-show="loginform.submitted">
+                                <p class="help-block">{{ loginform.errorMessage }}</p>
+                            </div>
                         </form>
                         <br />
                         <p>Not a member? <a href='#/sign-up' onclick='hideLogin()'>Sign up</a></p>

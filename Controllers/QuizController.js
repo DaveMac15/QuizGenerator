@@ -15,7 +15,9 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
     $scope.loginform = { username: "", password: "" };
     $scope.loggedIn = true;
     $scope.username = "";
-    
+    $scope.loginform.submitted = false;
+    $scope.loginform.errorMessage = "";
+
     LoginService.getSessionVariables().then(function (response) {
         $scope.username = response.data.username;
         $scope.loggedIn = response.data.loggedIn;
@@ -66,12 +68,12 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
         }
     };
     
-
+    
     QuizService.getList().then(success = function (response) { $scope.quizList = response; });
 
     /* when user submits log in credentials */
     $scope.onClickLogin = function () {
-
+        $scope.loginform.submitted = true;
         LoginService.login($scope.loginform.username, $scope.loginform.password).success(function (response) {
             
             if (response == 1) {
@@ -79,9 +81,10 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
                 $scope.username = $scope.loginform.username;
                 $scope.loginform.username = "";
                 $scope.loginform.password = "";
-                
+                $scope.loginform.errorMessage = "";
+                $scope.login.submitted = false;
             } else {
-                alert(response);
+                $scope.loginform.errorMessage = response;
             }
         });
     };
@@ -98,7 +101,6 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
         
         $scope.signup.submitted = true;
         if (valid && $scope.signup.password == $scope.signup.repeatPassword) {
-
             LoginService.signup($scope.signup.username, $scope.signup.password).success(function (response) {
                 
                 if (response == 0) { 
@@ -107,8 +109,7 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
                 else if (response == 1) {
                     // success
                     $scope.signup.alreadyExistsError = false;
-                    
-                    
+
                     $scope.loginform.username = $scope.signup.username;
                     $scope.loginform.password = $scope.signup.password;
                     $scope.onClickLogin();
