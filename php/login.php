@@ -23,8 +23,9 @@ if( $row['TOTAL'] > 0){
     session_start();
     $_SESSION['username'] = $user;
     $_SESSION['loggedIn'] = true;
-
-    echo "success";
+    $_SESSION['LAST_ACTIVITY'] = time();
+    
+    echo "1";
 }
 else{
     echo "User record does not exist.";

@@ -2,23 +2,28 @@
  * @Author: David MacCormick
  * @Date: November 2015
  * 
- * AngularJS controller to control the behaviour of Quiz application
+ * AngularJS controller to control the behaviour of Quiz application.
  */
 
 app.controller('QuizController', function ($scope, $location, $window, Session, QuizService, LoginService) {
-   
+    $scope.rendering = true;
 
     /* the currently loaded quiz */
     $scope.quiz = {};
 
     /* the user currently logged in */
     $scope.loginform = { username: "", password: "" };
-    $scope.loggedIn = false;
+    $scope.loggedIn = true;
     $scope.username = "";
     
-    LoginService.getSessionVariables().success(function (response) {
-        $scope.username = response.username;
-        $scope.loggedIn = response.loggedIn;
+    LoginService.getSessionVariables().then(function (response) {
+        $scope.username = response.data.username;
+        $scope.loggedIn = response.data.loggedIn;
+        $scope.rendering = false;
+    }, function (response) {
+        $scope.username = "";
+        $scope.loggedIn = false;
+        $scope.rendering = false;
     });
     
     /* variables for the sign up form */
@@ -56,6 +61,8 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
             $location.path('/home')
         } else if (path == "edit") {
             $location.path('/home');
+        } else if (path == "message") {
+            $location.path('/home');
         }
     };
     
@@ -66,12 +73,12 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
     $scope.onClickLogin = function () {
 
         LoginService.login($scope.loginform.username, $scope.loginform.password).success(function (response) {
-            if (response == "success") {
+            
+            if (response == 1) {
                 $scope.loggedIn = true;
                 $scope.username = $scope.loginform.username;
                 $scope.loginform.username = "";
                 $scope.loginform.password = "";
-
                 
             } else {
                 alert(response);
@@ -116,6 +123,7 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
 
     /* when user clicks on a quiz */
     $scope.onClickQuiz = function (id, name, index) {
+        $scope.scrollTop();
         $scope.submitted = false;
         $scope.isQuizOpen = true;
         $scope.isCompleted = false;
@@ -124,7 +132,7 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
         $scope.isEditMode = false;
         $scope.quizIndex = index;
 		$scope.highScores = [];
-		
+		//alert("id=" + id + ",index=" + index);
 		$scope.quiz = QuizService.getQuiz(id)
             .then(function (response) {
                 $scope.quiz = new QuizService.Quiz(id, name, response);
@@ -138,11 +146,12 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
             });
     };
     
-
     /* when user finishes quiz, clicks submit */
     $scope.onClickSubmitQuiz = function (isValid) {
+
         $scope.submitted = true;
         if (isValid) {
+            $scope.scrollTop();
             $scope.isCompleted = true;
 
             $scope.score = $scope.calculateScore();
@@ -155,6 +164,7 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
    
     };
 
+    /* returns the user's score as a percentage */
     $scope.calculateScore = function () {
         var numCorrect = 0;
         for (var i = 0; i < $scope.quiz.questions.length; i++) {
@@ -168,6 +178,7 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
 
     /* when user clicks on Create button */
     $scope.onClickCreate = function () {
+        $scope.scrollTop();
         $scope.pageTitle = "Quiz Generator";
         $location.path('/create');
         $scope.submitted = false;
@@ -179,6 +190,7 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
 
     /* user clicks on Edit button */
     $scope.onClickEdit = function () {
+        $scope.scrollTop();
         $scope.pageTitle = "Edit Quiz";
         $location.path('/edit');
         $scope.isEditMode = true;
@@ -188,30 +200,36 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
 
     /* user clicks on Save button */
     $scope.onClickSave = function (isValid) {
-        $scope.submitted = true;       
-        if (isValid) {            
+        $scope.submitted = true;
+        
+        if (isValid) {
+            $scope.scrollTop();
+
             var id = $scope.quiz.id;
-            QuizService.saveQuiz($scope.quiz).success(function (reponse) {
+            QuizService.saveQuiz($scope.quiz).then(function (response) {
                 // if the quiz is newly created, add it to the left nav
-                if (id < 0) {
-                    id = response;
+                
+                if (id < 0) {                        
+                    id = parseInt(response.data);
                     $scope.quizList.push({ name: $scope.quiz.name, id: id });
                     $scope.quizIndex = $scope.quizList.length - 1;
+                    $scope.message = "Quiz has been added to the database.";
                 } else {
                     $scope.quizList[$scope.quizIndex].name = $scope.quiz.name;
+                    $scope.message = "Changes were saved to the database.";
                 }
                 $scope.saved = true;
                 $scope.isEditMode = false;
-                $scope.submitted = false;
-                $scope.message = "Quiz Saved";
+                $scope.submitted = false;               
                 $location.path('/message');
             });
         }
     };
     
+    /* when user clicks delete button */
     $scope.onClickDelete = function () {        
         
-        QuizService.deleteQuiz($scope.quiz.id).success(function (response) { 
+        QuizService.deleteQuiz($scope.quiz.id).then(function (response) { 
             $scope.message = "Quiz Deleted ";
             $scope.isEditMode = false;
             $scope.isNewQuiz = false;
@@ -220,21 +238,26 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
             $location.path('/message');
             
             // check if quiz is listed on the left nav
-            if ($scope.quiz.id >= 0) {
+            if ($scope.quiz.id >= 0) {                
                 $scope.quizList.splice($scope.quizIndex, 1);
             }
-        }).error(function (response) {
+        },function (response) {
             $scope.message = "Failed: " + response;
         });
     };
 
+    /* when user clicks Cancel button */
     $scope.onClickCancel = function () {
         $window.history.back();
     };
 
+    /* returns letter from an index (0 => a, 1 => b, 2 => c, etc)  */
     $scope.indexChar = function (index) {
         return String.fromCharCode(97 + index);
     };
+
+    /* causes browser to scroll to the top of the page */
+    $scope.scrollTop = function () { $("html, body").animate({ scrollTop: 0 }, "slow"); return false; };
 
     $scope.onLoad();
 });

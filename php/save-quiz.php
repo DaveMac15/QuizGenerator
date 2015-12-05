@@ -16,6 +16,18 @@ if($conn->connect_error){
 	exit;
 }
 
+
+// if quiz already exists, delete old questions so that they can be replaced
+if($id >= 0){
+  $sql = "DELETE FROM questions WHERE quiz_id = " . $id;
+  
+  if($conn->query($sql) === TRUE){
+  } else {
+	      echo "Error: " . $sql . "<br> " . $conn->error;
+    }
+}
+
+
 // if the quiz is newly created, insert new quiz into quizzes table
 if($id < 0){
   $sql = "INSERT INTO quizzes (quiz_id, quiz_name) VALUES (NULL, '" . $name . "')";
@@ -24,7 +36,7 @@ if($id < 0){
 	  $last_id = mysqli_insert_id($conn);
 	  $id = $last_id;
 	  // send the id of the quiz back to the client
-	  echo $last_id;
+	  
   } else {
 	  echo "Error: " . $sql . "<br> " . $conn->error;
   }
@@ -37,15 +49,7 @@ if($id < 0){
     }
 }
 
-// if quiz already exists, delete old questions so that they can be replaced
-if($id >= 0){
-  $sql = "DELETE FROM questions WHERE quiz_id = " . $id;
-  
-  if($conn->query($sql) === TRUE){
-  } else {
-	      echo "Error: " . $sql . "<br> " . $conn->error;
-    }
-}
+
 
 // insert questions into questions table
 $length = count($questions);
@@ -78,7 +82,7 @@ for ($x = 0; $x < $length; $x++){
 }
 
 
-
+echo $id;
 
 $conn->close();
 

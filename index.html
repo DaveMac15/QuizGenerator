@@ -39,8 +39,7 @@
                                 </button>
                             </li>
                             <li>
-                                <button class="list-group-item" ng-disabled="isNewQuiz || !isQuizOpen" href="#/message"
-                                        ng-click="onClickDelete()"
+                                <button class="list-group-item" ng-disabled="isNewQuiz || !isQuizOpen" href="#/message"           
                                         data-toggle="modal" data-target="#deleteModal">
                                     <span class="glyphicon glyphicon-trash"></span> Delete
                                 </button>
@@ -71,12 +70,12 @@
     </nav>
 	
     <main>
-    
+    <div ng-if="false" style="height:2000px"></div>
     <div class="container">
 	    <div class="row">
             <!-- left nav -->
             <div class="col-md-2 col-sm-3 col-xs-12" >
-                <div class="container-fluid well" style="margin-bottom:10px;">
+                <div class="container-fluid well" ng-show="!rendering" style="margin-bottom:10px;">
                     <div ng-hide="loggedIn">
                         <h2>Login</h2>
                         <form name="loginForm" novalidate>
@@ -116,8 +115,7 @@
                         <a ng-repeat="quiz in quizList" class="list-group-item"
                            ng-click="onClickQuiz(quiz.id, quiz.name, $index)">
                             {{quiz.name}}
-                        </a>
-                    
+                        </a>        
                 </div>
 
                 <!-- tools menu for creating,editing,deleting quizzes -->
@@ -184,6 +182,7 @@
  
     $("a[href='#top']").click(function () { $("html, body").animate({ scrollTop: 0 }, "slow"); return false; });
    
+    
 </script>
 
 <!-- Latest compiled JavaScript -->
