@@ -258,7 +258,10 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
     };
 
     /* causes browser to scroll to the top of the page */
-    $scope.scrollTop = function () { $("html, body").animate({ scrollTop: 0 }, "slow"); return false; };
+    $scope.scrollTop = function () {
+        $("html, body").animate({ scrollTop: 0  }, "slow");
+        return false;
+    };
 
     $scope.onLoad();
 });
