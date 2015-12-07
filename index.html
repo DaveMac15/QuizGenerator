@@ -72,9 +72,9 @@
     <main>
     <div ng-if="false" style="height:2000px"></div>
     <div class="container">
-	    <div class="row">
-            <!-- left nav -->
-            <div class="col-md-2 col-sm-3 col-xs-12" >
+	    <div class="row">    
+            <!-- login -->
+            <div class="col-md-2 col-sm-3 col-xs-12">
                 <div class="container-fluid well" ng-show="!rendering" style="margin-bottom:10px;">
                     <div ng-hide="loggedIn">
                         <h2>Login</h2>
@@ -97,15 +97,14 @@
                         <a href="#/home" ng-click="onClickLogout()">Logout</a>
                     </div>
                 </div>
-                
+
             </div>
-            <section id="mycontainer"></section>
-            <!-- this is where quiz is displayed -->            
+
+            <!-- this is where quiz is displayed -->
             <div class="col-md-8 col-sm-6 col-xs-12" style="margin-bottom:10px">
                 <div class="row">
                     <div ng-view></div>
                 </div>
-                         
             </div> 
 
             <!-- right panel with list of quizzes -->
