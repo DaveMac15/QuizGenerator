@@ -133,18 +133,22 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
         $scope.isEditMode = false;
         $scope.quizIndex = index;
 		$scope.highScores = [];
-		//alert("id=" + id + ",index=" + index);
+		
+		//alert("id=" + id + ",index=" + index + ", name=" + name);
 		$scope.quiz = QuizService.getQuiz(id)
-            .then(function (response) {
+            .success(function (response) {
                 $scope.quiz = new QuizService.Quiz(id, name, response);
-
+				
                 // load the questions into Question objects
                 for (var i = 0; i < $scope.quiz.length; i++) {
                     var q = $scope.quiz.questions[i];
                     q = new QuizService.Question(q.text, q.options, q.correctIndex);
                 }
                 $location.path('quiz');
-            });
+            })
+			.error(function(response){
+				alert("Error getting quiz from database.");
+			});
     };
     
     /* when user finishes quiz, clicks submit */
@@ -156,12 +160,26 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
             $scope.isCompleted = true;
 
             $scope.score = $scope.calculateScore();
-        
-            $scope.highScores = QuizService.getHighScores($scope.quiz.id, $scope.username, $scope.score)
-            .success(function (response) {              
-                $scope.highScores = response;   
-            });
-        }
+			
+			// if user is logged in, add new highscore to database
+			if($scope.loggedIn){
+				QuizService.addHighscore($scope.quiz.id, $scope.username, $scope.score)
+				.success(function(response) {
+					
+					// display highscores
+					$scope.highScores = QuizService.getHighScores($scope.quiz.id)
+					.success(function (response) {              
+						$scope.highScores = response;   
+					});
+				});
+			} else {
+				// display highscores
+				$scope.highScores = QuizService.getHighScores($scope.quiz.id)
+				.success(function (response) {              
+					$scope.highScores = response;   
+				});
+			}
+		}
    
     };
 
@@ -207,23 +225,42 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
             $scope.scrollTop();
 
             var id = $scope.quiz.id;
-            QuizService.saveQuiz($scope.quiz).then(function (response) {
-                // if the quiz is newly created, add it to the left nav
-                
-                if (id < 0) {                        
-                    id = parseInt(response.data);
-                    $scope.quizList.push({ name: $scope.quiz.name, id: id });
+			
+			// if quiz is newly created, add it to the database, then update the contents
+			if(id < 0){
+				
+				QuizService.addQuiz().success(function(response){
+					id = parseInt(response);
+					$scope.quiz.id = id;
+					// add new quiz to the right nav
+					$scope.quizList.push({ name: $scope.quiz.name, id: id });
                     $scope.quizIndex = $scope.quizList.length - 1;
                     $scope.message = "Quiz has been added to the database.";
-                } else {
-                    $scope.quizList[$scope.quizIndex].name = $scope.quiz.name;
-                    $scope.message = "Changes were saved to the database.";
-                }
-                $scope.saved = true;
-                $scope.isEditMode = false;
-                $scope.submitted = false;               
-                $location.path('/message');
-            });
+					
+					// save the quiz
+					QuizService.saveQuiz($scope.quiz).then(function (response) {
+						$scope.quizList[$scope.quizIndex].name = $scope.quiz.name;
+						
+						$scope.saved = true;
+						$scope.isEditMode = false;
+						$scope.submitted = false;               
+						$location.path('/message');
+					});
+				});
+				
+			} else { // save the quiz
+				QuizService.saveQuiz($scope.quiz).then(function (response) {
+				   
+
+					$scope.quizList[$scope.quizIndex].name = $scope.quiz.name;
+					$scope.message = "Changes were saved to the database.";
+					
+					$scope.saved = true;
+					$scope.isEditMode = false;
+					$scope.submitted = false;               
+					$location.path('/message');
+				});
+			}
         }
     };
     
