@@ -7,29 +7,38 @@ $data = json_decode($credentials, false);
 
 $user = $data->username;
 $pass = $data->password;
+$dbname = "quiz_website";
+try {
+    $conn = new PDO("mysql:host=$hostname;dbname=$dbname", $username, $password);
+    // set the PDO error mode to exception
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	
+	// prepare sql and bind parameters
+	$stmt = $conn->prepare("SELECT count(*) AS TOTAL FROM users WHERE username = :user AND password = :pw");
+	
 
-$conn = new mysqli("localhost", $username, $password, "quiz_website");
-if($conn->connect_error){
-	echo("Connection failed" . $conn->connect_error);
-	exit;
-}
-                       
-$sql = "SELECT count(username) AS TOTAL FROM USERS WHERE username = '" . $user . "' AND password = '" . $pass . "'";
+	$stmt->bindParam(':user', $user);
+	$stmt->bindParam(':pw', $pass);
+	$stmt->execute();    
+    $numRows = $stmt->fetchColumn();
 
-$query = mysqli_query($conn, $sql);
-$row = mysqli_fetch_assoc($query);
-
-if( $row['TOTAL'] > 0){
-    session_start();
-    $_SESSION['username'] = $user;
-    $_SESSION['loggedIn'] = true;
-    $_SESSION['LAST_ACTIVITY'] = time();
-    
-    echo "1";
+	if( $numRows > 0){
+		session_start();
+		$_SESSION['username'] = $user;
+		$_SESSION['loggedIn'] = true;
+		$_SESSION['LAST_ACTIVITY'] = time();
+		
+		echo "1";
+	}
+	else{
+		echo "User record does not exist.";
+	}
+	
+} 
+catch(PDOException $e)
+{
+    echo "Error: " . $e->getMessage();
 }
-else{
-    echo "User record does not exist.";
-}
-$conn->close();
+$conn = null;
 
 ?>

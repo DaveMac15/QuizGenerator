@@ -86,7 +86,10 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
             } else {
                 $scope.loginform.errorMessage = response;
             }
-        });
+        })
+		.error(function(response){
+			alert(response);
+		});
     };
 
     $scope.onClickLogout = function () {
@@ -118,7 +121,10 @@ app.controller('QuizController', function ($scope, $location, $window, Session, 
                 else {
                     alert(reponse);
                 }
-            });
+            })
+			.error(function(response){
+				alert(response);
+			});
         }
     };
 

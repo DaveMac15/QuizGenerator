@@ -3,6 +3,7 @@
  * @Date: November 2015
  * 
  * AngularJS service for Quiz application 
+ *    -- defines Quiz object constructor and Question object constructor
  *    -- performs CRUD operations for quizzes in the application
  */
 
@@ -35,7 +36,7 @@ app.service('QuizService', function ($http, $q) {
 
     /* get quiz names for the left panel */
     this.getList = function () {
-        return $http.get("quiz_api.php/names")
+        return $http.get("php/quiz_api.php/names")
             .then(function (response) {
                 return response.data;
             });
@@ -43,7 +44,7 @@ app.service('QuizService', function ($http, $q) {
 
     /* load quiz from database using quiz id */
     this.getQuiz = function (id) {
-        return $http.get("quiz_api.php/quiz/" + id);
+        return $http.get("php/quiz_api.php/quiz/" + id);
             
     };
 
@@ -55,25 +56,25 @@ app.service('QuizService', function ($http, $q) {
     };
 	
 	this.addQuiz = function() {
-		return $http.get("quiz_api.php/quiz");
+		return $http.get("php/quiz_api.php/quiz");
 	}
 	
     /* save quiz to the database */
     this.saveQuiz = function (quiz) {
         var jsonQuiz = angular.toJson(quiz);
-        return $http.put('quiz_api.php/quiz/' + quiz.id, quiz);
+        return $http.post('php/quiz_api.php/quiz/' + quiz.id, quiz);
     };
 
     /* delete quiz from the database */
     this.deleteQuiz = function (id) {
-        return $http.delete("quiz_api.php/quiz/" + id);
+        return $http.delete("php/quiz_api.php/quiz/" + id);
     };
 
     this.getHighScores = function (id) {
-        return $http.get("quiz_api.php/highscores/" + id);
+        return $http.get("php/quiz_api.php/highscores/" + id);
     };
 	this.addHighscore = function(id, username, score){
-		return $http.post('quiz_api.php/highscores/' + id, {username:username, score:score });
+		return $http.post('php/quiz_api.php/highscores/' + id, {username:username, score:score });
 	}
 
     

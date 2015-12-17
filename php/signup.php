@@ -7,31 +7,35 @@ $data = json_decode($credentials, false);
 
 $user = $data->username;
 $pass = $data->password;
+$dbname = "quiz_website";
 
-$conn = new mysqli("localhost", $username, $password, "quiz_website");
-if($conn->connect_error){
-	echo("Connection failed" . $conn->connect_error);
-	exit;
+try {
+   $conn = new PDO("mysql:host=$hostname;dbname=$dbname", $username, $password);
+   // set the PDO error mode to exception
+   $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+   $stmt = $conn->prepare('select count(*) FROM users WHERE username = :user');   
+   $stmt->bindParam(':user', $user);
+   $stmt->execute();
+   $numRows= $stmt->fetchColumn();
+   
+   
+   if($numRows > 0){
+      echo "0";
+   } else {
+      $stmt = $conn->prepare('INSERT INTO users (USERNAME, PASSWORD, ID) VALUES (:user, :pw, NULL)');
+      $stmt->bindParam(':user', $user);
+      $stmt->bindParam(':pw', $pass);
+      $stmt->execute();
+      echo "1";
+   }
+   
+   
 }
-                       
-$sql = "SELECT count(username) AS TOTAL FROM USERS WHERE username = '" . $user . "'";
-
-$query = mysqli_query($conn, $sql);
-$row = mysqli_fetch_assoc($query);
-
-if( $row['TOTAL'] > 0){
-    echo "0";
-} else {
-    $sql = "INSERT INTO users (username, password, id) VALUES ('" . $user . "', '" . $pass . "', NULL)";    
-    if($conn->query($sql) === TRUE){
-        echo "1";
-    } else {
-	      echo "Error: " . $sql . "<br> " . $conn->error;
-    }
+catch(PDOException $e)
+{
+    echo "Error: " . $e->getMessage();
 }
-
-$conn->close();
-
+$conn = null;
 
 ?>
 
