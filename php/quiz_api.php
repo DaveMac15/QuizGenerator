@@ -6,14 +6,14 @@
  * This is a RESTful API for the Quiz Generator application.
  * It performs the following operations on Quiz objects:
  *
- * OPERATION:		 TYPE OF REQUEST:		DESCRIPTION:
- * /names		     GET    				returns array of quiz names and ids
- * /quiz/id          GET    				returns quiz with id of: id
- * /quiz/            GET    				creates new quiz and returns id added
- * /quiz/id          POST     				updates quiz with id of: id
- * /quiz/id	         DELETE  				deletes quiz with id of: id
- * /highscores/id    GET     				returns the highscores quiz with id of: id
- * /highscores/id    POST     				puts a new record into the highscores for quiz with id of: id
+ * OPERATION:	     TYPE OF HTTP REQUEST:	DESCRIPTION:
+ * /names	     GET    			returns array of quiz names and ids
+ * /quiz/id          GET    			returns quiz with id of: id
+ * /quiz/            GET    			creates new quiz and returns the id added
+ * /quiz/id          POST     			updates quiz with id of: id
+ * /quiz/id	     DELETE  			deletes quiz with id of: id
+ * /highscores/id    GET     			returns the highscores quiz with id of: id
+ * /highscores/id    POST     			puts a new record into the highscores for quiz with id of: id
  *
  */
 
@@ -28,6 +28,7 @@ try {
 	$options = array(PDO::ATTR_EMULATE_PREPARES => false, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
 	$conn = new PDO("mysql:host=$hostname;dbname=$dbname;charset=utf8", $username, $password, $options);
 	
+	// determine which operation is to be performed, and call the appropriate function
 	switch($method) {
 		case 'GET':
 			if($request[0] == 'quiz'){
@@ -63,7 +64,7 @@ catch(PDOException $e)
 
 
 
-
+/* returns quiz object with specified id in JSON format */
 function getQuiz($id){
 	global $conn;
 	
@@ -88,6 +89,7 @@ function getQuiz($id){
 	die($outp);	
 }
 
+/* returns list of all quiz names and ids */
 function getNames(){
 	global $conn;
 	
@@ -102,6 +104,7 @@ function getNames(){
 	die($outp);	
 }
 
+/* returns list of high scores for quiz with specified id */
 function getHighscores($id){
 	global $conn;
 	
@@ -122,6 +125,8 @@ function getHighscores($id){
 	$conn = null;	
 	die($outp);
 }
+
+/* inserts new high score into the highscores table */
 function addHighscore($id){
 	global $conn;
 	
@@ -151,7 +156,7 @@ function addHighscore($id){
 	die($outp);
 }
 
-/* function to create an empty quiz */
+/* creates an empty quiz and returns the id of the new quiz */
 function createQuiz(){
 	global $conn;
 	$name = "dummy";
@@ -167,6 +172,7 @@ function createQuiz(){
     $conn = null;
 }
 
+/* updates the quiz with specified id */
 function updateQuiz($id){
 	global $conn;
 	
@@ -233,6 +239,7 @@ function updateQuiz($id){
 	$conn = null;
 }
 
+/* deletes the quiz with specified id from the database */
 function deleteQuiz($id){
 	global $conn;
 	
